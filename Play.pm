@@ -17,8 +17,18 @@ my $player;
 my $volume;
 
 sub init {
-  #`bluetoothctl connect 2C:54:BB:2C:79:9B`;
-  #sleep 1;
+  my ($str, $connected, $count);
+  $connected = -1;
+  $count = 0;
+  while ($connected == -1) {
+    print_error("Connecting to speaker");
+    `bluetoothctl connect 2C:54:BB:2C:79:9B`;
+    sleep 1;
+    $str = `bluetoothctl info 2C:54:BB:2C:79:9B`;
+    $connected = index($str, "Connected: yes");
+    last if (++$count == 5);
+  }
+  print_error("Connected ok") if ($connected != -1);
   #`systemctl --user start pulseaudio`;
   set_volume($default_volume);
 }
